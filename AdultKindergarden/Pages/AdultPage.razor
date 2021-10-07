@@ -1,0 +1,115 @@
+﻿@page "/Adult/{FirstName}/{LastName}"
+@using Models
+@using FileData
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@inject NavigationManager _navMgr
+
+<h3>@FirstName @LastName</h3>
+@if (_adult != null)
+{
+    <p>
+        <b>Age:</b> @_adult.Age
+        <br/> <b>Sex:</b> @_adult.Sex
+        <br/> <b>Height:</b> @_adult.Height cm
+        <br/> <b>Weight:</b> @_adult.Weight kg
+        <br/> <b>Hair Color:</b> @_adult.HairColor
+        <br/> <b>Eye Color:</b> @_adult.EyeColor
+        <br/> <b>Job:</b> @_adult.JobTitle.JobTitle
+        <br/> <b>Salary:</b> @_adult.JobTitle.Salary €
+    </p>
+}
+else
+{
+    <p>Creating new Adult</p>
+    <EditForm Model="@_newAdult" OnValidSubmit="@AddNewAdult">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="form-group">
+            <p>
+                Age: <InputNumber @bind-Value="_newAdult.Age"/>
+            </p>
+            <p>
+                Hair Color: <InputText @bind-Value="_newAdult.HairColor"/>
+            </p>
+            <p>
+                Eye Color: <InputText @bind-Value="_newAdult.EyeColor"/>
+            </p>
+            <p>
+                Height: <InputNumber @bind-Value="_newAdult.Height"/>cm
+            </p>
+            <p>
+                Weight: <InputNumber @bind-Value="_newAdult.Weight"/>kg
+            </p>
+        </div>
+        <div class="form-group">
+            <h4>Job Information</h4>
+            <p>
+                Job Title: <InputText @bind-Value="_newAdultJob.JobTitle"/>
+            </p>
+            <p>
+                Salary: <InputNumber @bind-Value="_newAdultJob.Salary"/> dkk
+            </p>
+        </div>
+        <p class="actions">
+            <button class="btn btn-outline-dark" type="submit">Add</button>
+        </p>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public string FirstName { get; set; }
+
+    [Parameter]
+    public string LastName { get; set; }
+
+    private Adult _adult;
+    private Adult _newAdult = new();
+    private FileContext _fc;
+    private Job _newAdultJob;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _fc = new();
+        IList<Family> families = _fc.Families;
+        List<Adult> adults = new List<Adult>();
+        foreach (Family family in families)
+        {
+            adults.AddRange(family.Adults);
+        }
+        _adult = adults.FirstOrDefault(a => a.FirstName.Equals(FirstName) && a.LastName.Equals(LastName));
+        if (_adult == null)
+        {
+            _newAdultJob = new();
+        }
+    }
+
+
+    private void AddNewAdult()
+    {
+        _newAdult.FirstName = FirstName;
+        _newAdult.LastName = LastName;
+        _newAdult.JobTitle = _newAdultJob;
+        Family family = GetFamily(LastName) ?? new Family();
+
+        family.Adults.Add(_newAdult);
+
+        _fc.SaveChanges();
+        _navMgr.NavigateTo("Adults");
+    }
+
+    private Family GetFamily(String familyName)
+    {
+        foreach (Family family in _fc.Families)
+        {
+            if (family.Adults.ToArray()[0].LastName.Equals(familyName))
+            {
+                return family;
+            }
+        }
+        return null;
+    }
+
+}

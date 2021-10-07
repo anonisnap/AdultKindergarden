@@ -3,6 +3,19 @@
 @using FileData
 <h3>Adults</h3>
 
+<p>Here you can see all the registered sax offenders. These have all been caught playing Saxophone without a permit</p>
+<p>
+    <i>This town never ceases to amaze</i>
+</p>
+
+<ul>
+    @foreach (Adult adult in _adults)
+    {
+        <li><a href="Adult/@adult.FirstName/@adult.LastName">@adult.FirstName @adult.LastName</a> (@adult.Age)</li>
+    }
+</ul>
+
+
 @code {
     private IList<Adult> _adults;
 
@@ -20,9 +33,20 @@
 
     // Get All Families to construct a list of Adults
         IList<Family> families = fc.Families;
+        IList<Adult> adults = new List<Adult>();
 
     // Loop through all families and copy Adults into new List
+        foreach (Family family in families)
+        {
+            family.Adults.ForEach(a => adults.Add(a));
+        }
 
+    // Return the constructed new list
+        return adults;
+    }
+
+    private void GoToAdult(string firstName, string lastName)
+    {
     }
 
 }
