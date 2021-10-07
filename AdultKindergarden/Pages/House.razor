@@ -1,0 +1,51 @@
+﻿@page "/House/{Street}/{Number:int}"
+@using Models
+@using FileData
+<h3><i>@Street, @Number</i></h3>
+
+<h4>Adults:</h4>
+
+<ul>
+    @foreach (Adult a in _family.Adults) {
+        <li>@a.FirstName @a.LastName (@a.Age)</li>
+    }
+</ul>
+
+@if (_family.Children.Count != 0) {
+    <h4>Children:</h4>
+    <ul>
+        @foreach (Child c in _family.Children) {
+            <li>@c.FirstName @c.LastName (@c.Age)</li>
+        }
+    </ul>
+}
+@if (_family.Pets.Count != 0) {
+    <h4>Pets:</h4>
+    <ul>
+        @foreach (Pet p in _family.Pets) {
+            <li>@p.Name (@p.Age) <i>@p.Species</i> </li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string Street {
+        get; set;
+    }
+
+    [Parameter]
+    public int Number {
+        get; set;
+    }
+
+    private Family _family;
+
+    protected override async Task OnInitializedAsync( ) {
+        FileContext fc = new( );
+        IList<Family> allFamilies = fc.Families;
+        _family = allFamilies.First(f => f.StreetName.Equals(Street) && f.HouseNumber == Number);
+    }
+
+}

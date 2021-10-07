@@ -1,0 +1,28 @@
+﻿@page "/Adults"
+@using Models
+@using FileData
+<h3>Adults</h3>
+
+@code {
+    private IList<Adult> _adults;
+
+    protected override async Task OnInitializedAsync()
+    {
+    // Let's just pretend the FileContext didn't just have to read a 200 line JSON file...
+    // Like, imagine it was actually exciting!
+        _adults = await GetAdultsFromFamilyListAsync();
+    }
+
+    private async Task<IList<Adult>> GetAdultsFromFamilyListAsync()
+    {
+    // Get FileContext so we can access the JSON file
+        FileContext fc = new();
+
+    // Get All Families to construct a list of Adults
+        IList<Family> families = fc.Families;
+
+    // Loop through all families and copy Adults into new List
+
+    }
+
+}

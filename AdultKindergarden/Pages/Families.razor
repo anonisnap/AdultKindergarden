@@ -1,0 +1,39 @@
+﻿@page "/Families"
+@using FileData
+@using Models
+@inject NavigationManager _navMgr
+
+<h3>Families</h3>
+
+<p>
+    Here you can see a list of our finest families on selection. You are free to browse among the available and even the ordered ones, as we are often willing to change it around if a sufficient price is paid.
+</p>
+
+<p>
+    @foreach (Family f in _families)
+    {
+        <div class="m-3 border-bottom border-secondary d-block">
+            <button class="btn-info d-inline-flex m-2" @onclick="@(() => GotoHouse(f.StreetName, f.HouseNumber))">Info</button>
+            <p class="d-inline-flex">@f.StreetName @f.HouseNumber</p>
+        </div>
+    }
+</p>
+
+
+@code {
+    private IList<Family> _families;
+    private FileContext _fileContext;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _fileContext = new();
+        _families = _fileContext.Families;
+    }
+
+    void GotoHouse(string streetName, int houseNumber)
+    {
+        _navMgr.NavigateTo($"House/{streetName}/{houseNumber}");
+    }
+
+}
